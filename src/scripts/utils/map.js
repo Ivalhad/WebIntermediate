@@ -1,7 +1,6 @@
 // src/scripts/utils/map.js
 import L from 'leaflet';
 
-// Mengatur ulang path ikon default Leaflet agar sesuai dengan folder 'dist/images'
 delete L.Icon.Default.prototype._getIconUrl;
 
 L.Icon.Default.mergeOptions({
@@ -12,10 +11,37 @@ L.Icon.Default.mergeOptions({
 
 
 const initMap = (elementId, center = [0, 0], zoom = 2) => {
-  const map = L.map(elementId).setView(center, zoom);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors',
-  }).addTo(map);
+
+  const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  });
+
+  const stadiaDark = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
+	  maxZoom: 20,
+	  attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+  });
+
+  const openTopo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+	  maxZoom: 17,
+	  attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+  });
+  
+
+  const baseMaps = {
+    "Normal": osm,
+    "Gelap": stadiaDark,
+    "Topografi": openTopo,
+  };
+
+  const map = L.map(elementId, {
+    center: center,
+    zoom: zoom,
+    layers: [osm] 
+  });
+
+
+  L.control.layers(baseMaps).addTo(map);
+
   
   setTimeout(() => {
     map.invalidateSize();
