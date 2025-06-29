@@ -203,12 +203,11 @@ form button:hover {
 
 /* Styles for Desktop */
 @media screen and (min-width: 800px) {
-  /* Sembunyikan tombol hamburger di desktop */
+
   .drawer-button {
     display: none;
   }
   
-  /* Ubah navigasi menjadi menu horizontal di desktop */
   .navigation-drawer {
     position: static;
     transform: none;
@@ -230,9 +229,6 @@ form button:hover {
   }
 }
 
-/* === Kustomisasi Transisi Halaman (Web Animations API) === */
-
-/* Keyframes untuk animasi slide dan fade */
 @keyframes slide-from-right {
   from {
     transform: translateX(30px);
@@ -247,10 +243,6 @@ form button:hover {
   }
 }
 
-/* Nama animasi ini akan kita panggil dari JavaScript.
-  View Transition API secara otomatis akan menerapkan kelas-kelas ini
-  pada gambar lama (::view-transition-old) dan gambar baru (::view-transition-new).
-*/
 ::view-transition-old(root) {
   animation: 300ms ease-in-out both slide-to-left;
 }
