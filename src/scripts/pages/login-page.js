@@ -10,7 +10,7 @@ const LoginPage = {
         <input type="email" id="email" name="email" required />
         <label for="password">Password</label>
         <input type="password" id="password" name="password" required />
-        <button type="submit">Login</button>
+        <button type="submit"><i class="fas fa-sign-in-alt"></i> Login</button>
       </form>
     </section>
   `,

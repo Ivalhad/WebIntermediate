@@ -1,22 +1,18 @@
-// src/scripts/index.js
-import { getRoute } from './routes/url-parser.js';
-const path = getRoute();
-import routes from './routes/routes.js';
+import 'leaflet/dist/leaflet.css';
+import '../styles/styles.css';
 
-const renderPage = async () => {
-  const path = UrlParser.parseActiveUrlWithCombiner(); // contoh: '/stories', '/add-story'
-  const page = routes[path] || routes['/404'];
+import App from './pages/app.js';
 
-  // Transisi halaman mulus
-  if (document.startViewTransition) {
-    document.startViewTransition(() => {
-      document.getElementById('app').innerHTML = page.render();
-    }).finished.then(() => page.afterRender());
-  } else {
-    document.getElementById('app').innerHTML = page.render();
-    await page.afterRender();
-  }
-};
+const app = new App({
+  drawerButton: document.getElementById('drawer-button'),
+  navigationDrawer: document.querySelector('.navigation-drawer'),
+  content: document.getElementById('main-content'),
+});
 
-window.addEventListener('hashchange', renderPage);
-window.addEventListener('load', renderPage);
+window.addEventListener('hashchange', () => {
+  app.renderPage();
+});
+
+window.addEventListener('load', () => {
+  app.renderPage();
+});

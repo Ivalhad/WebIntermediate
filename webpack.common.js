@@ -9,9 +9,11 @@ module.exports = {
   output: {
     filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'dist'),
+    clean: true,
   },
   module: {
     rules: [
+      // ATURAN CSS DIHAPUS DARI SINI UNTUK MENGHINDARI KONFLIK
       {
         test: /\.(png|jpe?g|gif)$/i,
         type: 'asset/resource',
@@ -27,6 +29,11 @@ module.exports = {
         {
           from: path.resolve(__dirname, 'src/public/'),
           to: path.resolve(__dirname, 'dist/'),
+        },
+        // Menyalin gambar marker Leaflet ke folder dist
+        {
+          from: path.resolve(__dirname, 'node_modules/leaflet/dist/images'),
+          to: path.resolve(__dirname, 'dist/images'),
         },
       ],
     }),

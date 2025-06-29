@@ -7,6 +7,7 @@ module.exports = merge(common, {
   module: {
     rules: [
       {
+        // Aturan CSS yang benar untuk mode development
         test: /\.css$/,
         use: [
           'style-loader',
@@ -24,5 +25,7 @@ module.exports = merge(common, {
         warnings: true,
       },
     },
+    // Menambahkan open: true agar browser terbuka otomatis
+    open: true,
   },
 });

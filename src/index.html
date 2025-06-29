@@ -4,29 +4,35 @@
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="shortcut icon" href="favicon.png">
-    <link rel="stylesheet" href="/src/styles/styles.css">
 
-    <title>App</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <title>Story App</title>
   </head>
   <body>
+    <a href="#main-content" class="skip-link">Skip to Content</a>
     <header>
       <div class="main-header container">
-        <a class="brand-name" href="#/">App</a>
+        <a class="brand-name" href="#/">Story App</a>
 
-<nav>
-  <ul>
-    <li><a href="#/">Stories</a></li>
-    <li><a href="/src/scripts/pages/add-story-page.js">Tambah Story</a></li>
-    <li><a href="/src/scripts/pages/login-page.js">Login</a></li>
-    <li><a href="#/src/scripts/pages/register-page.js">Register</a></li>
-  </ul>
-</nav>
-
+        <nav class="navigation-drawer">
+          <ul class="nav-list">
+            <li><a href="#/stories"><i class="fas fa-book-open"></i> Stories</a></li>
+            <li id="nav-add-story"><a href="#/add-story"><i class="fas fa-plus-circle"></i> Tambah Story</a></li>
+            <li id="nav-login"><a href="#/login"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+            <li id="nav-register"><a href="#/register"><i class="fas fa-user-plus"></i> Register</a></li>
+            <li id="nav-logout" style="display: none;"><a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+          </ul>
+        </nav>
 
         <button id="drawer-button" class="drawer-button">☰</button>
       </div>
     </header>
 
-    <main id="main-content" class="main-content"></main>
+    <main id="main-content" class="main-content" tabindex="-1"></main>
   </body>
 </html>

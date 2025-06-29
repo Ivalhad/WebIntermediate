@@ -1,14 +1,8 @@
-// src/scripts/data/api.js
 import CONFIG from '../config.js';
-
-const HTTP_METHOD = {
-  GET: 'GET',
-  POST: 'POST',
-};
 
 const register = async ({ name, email, password }) => {
   const response = await fetch(`${CONFIG.BASE_URL}/register`, {
-    method: HTTP_METHOD.POST,
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
@@ -19,40 +13,12 @@ const register = async ({ name, email, password }) => {
 
 const login = async ({ email, password }) => {
   const response = await fetch(`${CONFIG.BASE_URL}/login`, {
-    method: HTTP_METHOD.POST,
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ email, password }),
   });
-  return response.json();
-};
-
-const getAllStories = async ({ page = 1, size = 10, location = 0, token }) => {
-  const url = new URL(`${CONFIG.BASE_URL}/stories`);
-  url.searchParams.append('page', page);
-  url.searchParams.append('size', size);
-  url.searchParams.append('location', location);
-
-  const response = await fetch(url, {
-    method: HTTP_METHOD.GET,
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  return response.json();
-};
-
-const getStoryDetail = async (id, token) => {
-  const response = await fetch(
-    `${CONFIG.BASE_URL}/stories/${id}`,
-    {
-      method: HTTP_METHOD.GET,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
-  );
   return response.json();
 };
 
@@ -66,11 +32,34 @@ const addStory = async ({ description, photo, lat, lon, token }) => {
   }
 
   const response = await fetch(`${CONFIG.BASE_URL}/stories`, {
-    method: HTTP_METHOD.POST,
+    method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
     },
     body: formData,
+  });
+  return response.json();
+};
+
+const getAllStories = async ({ page, size, location, token }) => {
+  const response = await fetch(
+    `${CONFIG.BASE_URL}/stories?page=${page}&size=${size}&location=${location ? 1 : 0}`, // Menggunakan CONFIG.BASE_URL
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: 'no-cache',
+    },
+  );
+  return response.json();
+};
+
+const getStoryDetail = async (id, token) => {
+  const response = await fetch(`${CONFIG.BASE_URL}/stories/${id}`, { // Menggunakan CONFIG.BASE_URL
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: 'no-cache',
   });
   return response.json();
 };
@@ -87,10 +76,7 @@ const addStoryGuest = async ({ description, photo, lat, lon }) => {
   const response = await fetch(
     `${CONFIG.BASE_URL}/stories/guest`,
     {
-      method: HTTP_METHOD.POST,
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+      method: 'POST',
       body: formData,
     },
   );
@@ -101,7 +87,7 @@ const subscribeNotification = async ({ subscription, token }) => {
   const response = await fetch(
     `${CONFIG.BASE_URL}/notifications/subscribe`,
     {
-      method: HTTP_METHOD.POST,
+      method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -116,7 +102,7 @@ const unsubscribeNotification = async ({ endpoint, token }) => {
   const response = await fetch(
     `${CONFIG.BASE_URL}/notifications/subscribe`,
     {
-      method: HTTP_METHOD.DELETE,
+      method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -126,6 +112,7 @@ const unsubscribeNotification = async ({ endpoint, token }) => {
   );
   return response.json();
 };
+
 
 export {
   register,
