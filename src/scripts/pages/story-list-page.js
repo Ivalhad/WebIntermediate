@@ -1,4 +1,4 @@
-import { getAllStories } from '../data/api.js';
+import StoryListPresenter from '../presenter/story-list-presenter.js';
 import { initMap, addMarkers } from '../utils/map.js';
 import L from 'leaflet';
 
@@ -11,73 +11,74 @@ const StoryListPage = {
     </section>
   `,
 
-  afterRender: async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      alert('Anda harus login untuk melihat cerita.');
-      window.location.hash = '#/login';
+  afterRender: () => {
+    // Inisialisasi presenter dan minta untuk memuat data
+    const presenter = new StoryListPresenter(StoryListPage);
+    presenter.getStories();
+  },
+
+  // === Metode yang dipanggil oleh Presenter ===
+
+  showLoading: () => {
+    const container = document.getElementById('stories-container');
+    container.innerHTML = '<p>Loading stories...</p>';
+  },
+
+  showStories: (stories) => {
+    const container = document.getElementById('stories-container');
+    container.innerHTML = ''; 
+
+    if (stories.length === 0) {
+      container.innerHTML = '<p>Belum ada cerita yang ditambahkan.</p>';
       return;
     }
+    
+    // Render Story Cards
+    stories.forEach((story) => {
+      const card = document.createElement('div');
+      card.className = 'story-card';
+      card.innerHTML = `
+        <img src="${story.photoUrl}" alt="Story by ${story.name}" />
+        <h3>${story.name}</h3>
+        <p>${story.description}</p>
+        <p><small>${new Date(story.createdAt).toLocaleString()}</small></p>
+      `;
+      card.addEventListener('click', () => {
+        window.location.hash = `#/stories/${story.id}`;
+      });
+      container.appendChild(card);
+    });
 
-    try {
-      const response = await getAllStories({ page: 1, size: 20, location: 1, token });
-      if (response.error) {
-        alert(response.message);
-        if (response.message.toLowerCase().includes('token')) {
-            localStorage.removeItem('token');
-            window.location.hash = '#/login';
-        }
-        return;
-      }
-
-      const container = document.getElementById('stories-container');
-      container.innerHTML = ''; 
-      
-      if (response.listStory.length === 0) {
-        container.innerHTML = '<p>Belum ada cerita yang ditambahkan.</p>';
-      } else {
-        response.listStory.forEach((story) => {
-          const card = document.createElement('div');
-          card.className = 'story-card';
-          card.innerHTML = `
-            <img src="${story.photoUrl}" alt="Story by ${story.name}" />
-            <h3>${story.name}</h3>
-            <p>${story.description}</p>
-            <p><small>${new Date(story.createdAt).toLocaleString()}</small></p>
-          `;
-          card.addEventListener('click', () => {
-            window.location.hash = `#/stories/${story.id}`;
+    // Render Map Markers
+    const map = initMap('map');
+    const markers = stories
+      .filter((s) => s.lat && s.lon)
+      .map((s) => {
+          const customIcon = L.icon({
+              iconUrl: s.photoUrl,
+              iconSize: [40, 40],
+              className: 'custom-marker-icon'
           });
-          container.appendChild(card);
-        });
-      }
-
-      const map = initMap('map');
+          return {
+              coords: [s.lat, s.lon],
+              popup: `<strong>${s.name}</strong><br>${s.description.substring(0, 30)}...`,
+              icon: customIcon
+          };
+      });
       
-      const markers = response.listStory
-        .filter((s) => s.lat && s.lon)
-        .map((s) => {
-            const customIcon = L.icon({
-                iconUrl: s.photoUrl,
-                iconSize: [40, 40],
-                className: 'custom-marker-icon'
-            });
-
-            return {
-                coords: [s.lat, s.lon],
-                popup: `<strong>${s.name}</strong><br>${s.description.substring(0, 30)}...`,
-                icon: customIcon
-            };
-        });
-        
-      if (markers.length > 0) {
-        addMarkers(map, markers);
-      }
-
-    } catch (error) {
-      console.error('Failed to fetch stories:', error);
-      document.getElementById('stories-container').innerHTML = '<p>Gagal memuat cerita. Silakan coba lagi nanti.</p>';
+    if (markers.length > 0) {
+      addMarkers(map, markers);
     }
+  },
+  
+  showError: (message) => {
+    const container = document.getElementById('stories-container');
+    container.innerHTML = `<p>${message}</p>`;
+  },
+
+  onUnauthorized: (message = 'Anda harus login untuk melihat cerita.') => {
+    alert(message);
+    window.location.hash = '#/login';
   },
 };
 

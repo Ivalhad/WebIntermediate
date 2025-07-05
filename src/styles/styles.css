@@ -4,10 +4,19 @@
   box-sizing: border-box;
 }
 
+/* DITAMBAHKAN: Memastikan html dan body mengambil tinggi penuh */
+html, body {
+  height: 100%;
+}
+
 body {
   font-family: 'Poppins', 'Arial', sans-serif;
   background-color: #f4f4f9;
   color: #333;
+  /* DITAMBAHKAN: Menggunakan Flexbox untuk layout utama */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Memastikan body minimal setinggi viewport */
 }
 
 .container {
@@ -50,7 +59,7 @@ header {
   gap: 30px;
 }
 
-.brand-name {
+.brand-name a {
   font-size: 1.5rem;
   font-weight: bold;
   text-decoration: none;
@@ -110,6 +119,8 @@ header {
 
 .main-content {
   padding-block: 20px;
+  /* DITAMBAHKAN: Membuat main content fleksibel untuk mengisi ruang */
+  flex: 1; 
 }
 
 .main-content h2 {
@@ -201,9 +212,7 @@ form button:hover {
   background-color: #eee;
 }
 
-/* Styles for Desktop */
 @media screen and (min-width: 800px) {
-
   .drawer-button {
     display: none;
   }
@@ -222,11 +231,19 @@ form button:hover {
     flex-direction: row;
     gap: 20px;
   }
-  
+
   .nav-list li a {
     display: inline-block;
     padding: 8px 12px;
   }
+}
+
+footer {
+  background-color: #2c3e50;
+  color: #ecf0f1;
+  text-align: center;
+  padding: 20px 0;
+  margin-top: auto; /* DITAMBAHKAN: Mendorong footer ke bawah */
 }
 
 @keyframes slide-from-right {

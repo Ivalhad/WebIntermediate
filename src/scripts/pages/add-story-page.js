@@ -1,6 +1,4 @@
-import { addStory } from '../data/api.js';
-import { initMap } from '../utils/map.js';
-import L from 'leaflet';
+import AddStoryPresenter from '../presenter/add-story-presenter.js';
 
 const AddStoryPage = {
   render: () => `
@@ -10,107 +8,78 @@ const AddStoryPage = {
         <label for="description">Description</label>
         <textarea id="description" name="description" required></textarea>
 
-        <label for="photo">Photo</label>
-        <input type="file" id="photo" name="photo" accept="image/*" capture required />
+        <video id="camera-stream" width="100%" autoplay style="margin-top: 10px;"></video>
+        <canvas id="canvas" style="display:none;"></canvas>
+        <button type="button" id="capture-button" style="margin-top: 5px;">Capture Photo</button>
+
+        <label for="photo" style="margin-top: 15px;">Or Upload Photo</label>
+        <input type="file" id="photo" name="photo" accept="image/*" />
 
         <div id="map-add" style="height: 300px; margin-top: 10px; border-radius: 8px; z-index: 0;"></div>
         <input type="hidden" id="lat" name="lat" />
         <input type="hidden" id="lon" name="lon" />
 
-        <button type="submit">Submit</button>
+        <button type="submit" style="margin-top: 15px;">Submit</button>
       </form>
     </section>
   `,
 
   afterRender: () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      alert('Anda harus login untuk menambah cerita.');
-      window.location.hash = '#/login';
-      return;
-    }
+    // Inisialisasi Presenter dan serahkan kontrol padanya
+    const presenter = new AddStoryPresenter(AddStoryPage);
+    presenter.init();
+  },
 
+  // === Metode yang dipanggil oleh Presenter ===
+  
+  getFormData: (capturedImage) => {
     const form = document.getElementById('story-form');
-    const latInput = document.getElementById('lat');
-    const lonInput = document.getElementById('lon');
-    const map = initMap('map-add');
-    let storyMarker = null;
-
-    // Fungsi untuk mengupdate marker dan input
-    const updateMarkerAndInputs = (lat, lon) => {
-      // Hapus marker lama jika ada
-      if (storyMarker) {
-        storyMarker.remove();
-      }
-
-      storyMarker = L.marker([lat, lon]).addTo(map);
-
-      latInput.value = lat;
-      lonInput.value = lon;
+    return {
+      description: form.description.value,
+      photo: capturedImage || form.photo.files[0],
+      lat: form.lat.value,
+      lon: form.lon.value
     };
+  },
 
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
+  setCoordinates: (lat, lon) => {
+    document.getElementById('lat').value = lat;
+    document.getElementById('lon').value = lon;
+  },
+  
+  onUnauthorized: () => {
+    alert('Anda harus login untuk menambah cerita.');
+    window.location.hash = '#/login';
+  },
 
-          map.setView([latitude, longitude], 13);
+  onPhotoCaptured: () => {
+    alert('Photo captured successfully!');
+  },
 
-          updateMarkerAndInputs(latitude, longitude);
-          alert('Lokasi Anda saat ini berhasil ditemukan!');
-        },
-        (error) => {
-          console.error('Error getting location:', error.message);
-          alert('Gagal mendapatkan lokasi Anda. Silakan pilih lokasi secara manual di peta.');
-        },
-      );
-    } else {
-      alert('Geolocation tidak didukung oleh browser ini. Silakan pilih lokasi secara manual.');
-    }
+  onCameraError: () => {
+    document.getElementById('camera-stream').style.display = 'none';
+    document.getElementById('capture-button').style.display = 'none';
+  },
+  
+  onLocationFound: () => {
+    alert('Lokasi Anda saat ini berhasil ditemukan!');
+  },
 
-    map.on('click', (e) => {
-      const { lat, lng } = e.latlng;
-      updateMarkerAndInputs(lat, lng);
-      map.setView([lat, lng]);
-    });
+  onLocationError: () => {
+    alert('Gagal mendapatkan lokasi. Silakan pilih lokasi secara manual di peta.');
+  },
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const description = form.description.value;
-      const photo = form.photo.files[0];
-      const lat = latInput.value;
-      const lon = lonInput.value;
-      
-      const currentToken = localStorage.getItem('token');
-      if (!currentToken) {
-        alert('Sesi Anda telah berakhir. Silakan login kembali.');
-        window.location.hash = '#/login';
-        return;
-      }
-      
-      if (!description || !photo) {
-        alert('Deskripsi dan foto tidak boleh kosong.');
-        return;
-      }
+  onValidationError: (message) => {
+    alert(message);
+  },
 
-      if (!lat || !lon) {
-        alert('Silakan pilih lokasi cerita di peta terlebih dahulu.');
-        return;
-      }
+  onSubmissionSuccess: () => {
+    alert('Story berhasil ditambahkan');
+    window.location.hash = '#/stories';
+  },
 
-      try {
-        const response = await addStory({ description, photo, lat, lon, token: currentToken });
-        if (!response.error) {
-          alert('Story berhasil ditambahkan');
-          window.location.hash = '#/stories';
-        } else {
-          alert(response.message);
-        }
-      } catch (error) {
-        console.error('Error adding story:', error);
-        alert('Gagal menambahkan cerita. Periksa koneksi Anda.');
-      }
-    });
+  onSubmissionFailed: (message) => {
+    alert(message);
   },
 };
 

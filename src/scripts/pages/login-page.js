@@ -1,5 +1,4 @@
-// src/scripts/pages/login-page.js
-import { login } from '../data/api.js';
+import LoginPresenter from '../presenter/login-presenter.js';
 
 const LoginPage = {
   render: () => `
@@ -16,19 +15,29 @@ const LoginPage = {
   `,
 
   afterRender: () => {
+    // Inisialisasi presenter untuk mengelola logika halaman ini
+    new LoginPresenter(LoginPage);
+  },
+
+  // === Metode yang dipanggil oleh Presenter ===
+
+  getLoginForm: () => document.getElementById('login-form'),
+
+  getFormData: () => {
     const form = document.getElementById('login-form');
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = form.email.value;
-      const password = form.password.value;
-      const result = await login({ email, password });
-      if (!result.error) {
-        localStorage.setItem('token', result.loginResult.token);
-        window.location.hash = '#/stories';
-      } else {
-        alert(result.message);
-      }
-    });
+    return {
+      email: form.email.value,
+      password: form.password.value,
+    };
+  },
+
+  onLoginSuccess: () => {
+    // Arahkan ke halaman cerita setelah berhasil login
+    window.location.hash = '#/stories';
+  },
+
+  onLoginFailed: (message) => {
+    alert(message);
   },
 };
 
